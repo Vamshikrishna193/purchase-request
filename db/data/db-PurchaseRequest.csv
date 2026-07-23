@@ -1,0 +1,7 @@
+ID,requestNo,requesterName,department,requestDate,currency,totalAmount,status,approver,rejectionComments,approvalComments
+11111111-1111-1111-1111-111111111111,PR-2026-000001,Vamshi,IT,2026-06-01,INR,35400,Draft,Manager,,
+22222222-2222-2222-2222-222222222222,PR-2026-000002,Rahul,Finance,2026-06-05,INR,118000,Submitted,Director,,
+33333333-3333-3333-3333-333333333333,PR-2026-000003,Anjali,HR,2026-06-08,INR,23600,Approved,Manager,,Approved Successfully
+44444444-4444-4444-4444-444444444444,PR-2026-000004,Kiran,Procurement,2026-06-10,INR,70800,Rejected,Director,Insufficient business justification,
+55555555-5555-5555-5555-555555555555,PR-2026-000005,Sneha,Manufacturing,2026-06-12,INR,94400,Cancelled,Senior Manager,,
+
