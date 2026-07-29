@@ -9,13 +9,14 @@ annotate service.PurchaseRequests with @(
         Description   : {Value: requesterName}
     },
 
-    // UI.SelectionFields : [
-    //     requestNo,
-    //     requesterName,
-    //     department,
-    //     status,
-    //     requestDate
-    // ],
+    UI.SelectionFields : [
+        department,
+        status,
+        requesterName,
+        totalAmount,
+        requestDate,
+
+    ],
 
     UI.LineItem           : [
         {

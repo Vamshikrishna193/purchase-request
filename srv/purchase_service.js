@@ -54,6 +54,47 @@ module.exports = cds.service.impl(async function () {
             );
         }
 
+        // Rule 11 - Duplicate Purchase Request within 7 days
+
+        if (items.length > 0) {
+
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            const oldRequests = await SELECT.from(PurchaseRequests)
+                .where({
+                    //requesterName: purchaseRequest.requesterName,
+                    department: purchaseRequest.department
+                });
+
+            for (const oldRequest of oldRequests) {
+                if (oldRequest.ID === requestId) continue;
+                if (new Date(oldRequest.requestDate) >= sevenDaysAgo) {
+
+                    const oldItems = await SELECT.from(PurchaseRequestItems)
+                        .where({ request_ID: oldRequest.ID });
+
+                    for (const newItem of items) {
+
+                        const duplicate = oldItems.find(item =>
+                            item.materialNo === newItem.materialNo &&
+                            item.quantity === newItem.quantity
+                        );
+
+                        if (duplicate) {
+
+                            req.error(
+                                400,
+                                'Duplicate Purchase Request exists within the last 7 days.'
+                            );
+
+                        }
+                    }
+                }
+            }
+        }
+
+
         // Rule 23 - Minimum Amount
         if (purchaseRequest.totalAmount <= 100) {
             return req.error(
@@ -454,42 +495,42 @@ module.exports = cds.service.impl(async function () {
 
         // Rule 11 - Duplicate Purchase Request within 7 days
 
-        if (req.data.items && req.data.items.length > 0) {
+        // if (req.data.items && req.data.items.length > 0) {
 
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        //     const sevenDaysAgo = new Date();
+        //     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-            const oldRequests = await SELECT.from(PurchaseRequests)
-                .where({
-                    requesterName: req.data.requesterName,
-                    department: req.data.department
-                });
+        //     const oldRequests = await SELECT.from(PurchaseRequests)
+        //         .where({
+        //             requesterName: req.data.requesterName,
+        //             department: req.data.department
+        //         });
 
-            for (const oldRequest of oldRequests) {
+        //     for (const oldRequest of oldRequests) {
 
-                if (new Date(oldRequest.requestDate) >= sevenDaysAgo) {
+        //         if (new Date(oldRequest.requestDate) >= sevenDaysAgo) {
 
-                    const oldItems = await SELECT.from(PurchaseRequestItems)
-                        .where({ request_ID: oldRequest.ID });
+        //             const oldItems = await SELECT.from(PurchaseRequestItems)
+        //                 .where({ request_ID: oldRequest.ID });
 
-                    for (const newItem of req.data.items) {
+        //             for (const newItem of req.data.items) {
 
-                        const duplicate = oldItems.find(item =>
-                            item.materialNo === newItem.materialNo &&
-                            item.quantity === newItem.quantity
-                        );
+        //                 const duplicate = oldItems.find(item =>
+        //                     item.materialNo === newItem.materialNo &&
+        //                     item.quantity === newItem.quantity
+        //                 );
 
-                        if (duplicate) {
+        //                 if (duplicate) {
 
-                            req.error(
-                                'Duplicate Purchase Request exists within the last 7 days.'
-                            );
+        //                     req.error(
+        //                         'Duplicate Purchase Request exists within the last 7 days.'
+        //                     );
 
-                        }
-                    }
-                }
-            }
-        }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
 
         // Rule 12 - Department Validation
@@ -670,15 +711,34 @@ module.exports = cds.service.impl(async function () {
 
 
     });
-    // Rule 21 - Immutable Records
+
+
+     // Rule 21 - Immutable Records
 
     this.before(['UPDATE', 'DELETE'], PurchaseRequests, async (req) => {
-        cds.log('Checking if the request is Approved, Rejected or Cancelled...------------------------', req.data)
-
 
         const request = await SELECT.one
             .from(PurchaseRequests)
             .where({ ID: req.data.ID });
+
+            const createdDate = new Date(request.createdAt);
+    const today = new Date();
+
+    const diffDays = Math.floor(
+        (today - createdDate) / (1000 * 60 * 60 * 24)
+    );
+
+    if (request.status === 'Draft' && diffDays > 30) {
+
+        await UPDATE(PurchaseRequests)
+            .set({ status: 'Expired' })
+            .where({ ID: request.ID });
+
+        return req.error(
+            400,
+            'Draft Request has expired after 30 days.'
+        );
+    }
 
         if (
             request &&
@@ -697,3 +757,4 @@ module.exports = cds.service.impl(async function () {
     });
 
 });
+   

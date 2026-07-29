@@ -56,7 +56,7 @@ entity Notification : cuid, managed {
     request : Association to PurchaseRequest;
     message : String(500);
     type    : String(50);
-
+    isRead  : Boolean default false;
 }
 
 entity StatusHistory : cuid, managed {
