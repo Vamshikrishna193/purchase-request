@@ -393,8 +393,5 @@ UI.LineItem: [
         Label: 'File Size'
     },
 
-    {
-        Value: mediaType,
-        Label: 'Media Type'
-    }
+    
 ]);
