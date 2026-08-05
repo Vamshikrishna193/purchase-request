@@ -19,6 +19,3 @@ service purchaseRequestService {
     entity Departments          as projection on db.Department;
     entity Currencies           as projection on db.Currency;
 }
-
-
-
