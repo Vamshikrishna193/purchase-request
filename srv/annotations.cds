@@ -397,4 +397,5 @@ UI.LineItem: [
         Value: mediaType,
         Label: 'Media Type'
     }
+    
 ]);

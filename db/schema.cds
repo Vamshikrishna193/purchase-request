@@ -21,7 +21,7 @@ entity PurchaseRequest : cuid, managed {
     approvedAt        : Timestamp;
     rejectedBy        : String(100);
     rejectedAt        : Timestamp;
-    // createdByUser : String(100);
+     createdByUser : String(100);
 
     items             : Composition of many PurchaseRequestItem
                             on items.request = $self;
@@ -34,8 +34,8 @@ entity PurchaseRequest : cuid, managed {
 
     attachments       : Composition of many Attachments;
 
-// auditLogs  : Composition of many Audit
-//           on auditLogs.request = $self;
+ //auditLogs  : Composition of many Audit
+   //        on auditLogs.request = $self;
 
 }
 
