@@ -1,5 +1,5 @@
 using db as db from '../db/schema';
-using {Attachments as ManagedAttachments} from '@cap-js/attachments';
+//using {Attachments as ManagedAttachments} from '@cap-js/attachments';
 
 service purchaseRequestService {
 
@@ -17,5 +17,5 @@ service purchaseRequestService {
     entity StatusHistories      as projection on db.StatusHistory;
     //entity Attachments as projection on ManagedAttachments;
     entity Departments          as projection on db.Department;
-    entity Currencies           as projection on db.Currency;
+    entity Currencies           as projection on db.Currency;                 
 }

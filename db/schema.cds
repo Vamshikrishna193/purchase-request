@@ -2,7 +2,7 @@ namespace db;
 
 using {cuid,managed} from '@sap/cds/common';
 
-using {Attachments} from '@cap-js/attachments';
+//using {Attachments} from '@cap-js/attachments';
 
 
 entity PurchaseRequest : cuid, managed {
@@ -32,7 +32,7 @@ entity PurchaseRequest : cuid, managed {
     history           : Composition of many StatusHistory
                             on history.request = $self;
 
-    attachments       : Composition of many Attachments;
+    //attachments       : Composition of many Attachments;
 
  //auditLogs  : Composition of many Audit
    //        on auditLogs.request = $self;

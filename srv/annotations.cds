@@ -379,23 +379,23 @@ annotate service.PurchaseRequestItems with {
 };
 
 
-annotate service.PurchaseRequestAttachments with @(
+// annotate service.PurchaseRequestAttachments with @(
 
-UI.LineItem: [
+// UI.LineItem: [
 
-    {
-        Value: fileName,
-        Label: 'File Name'
-    },
+//     {
+//         Value: fileName,
+//         Label: 'File Name'
+//     },
 
-    {
-        Value: fileSize,
-        Label: 'File Size'
-    },
+//     {
+//         Value: fileSize,
+//         Label: 'File Size'
+//     },
 
-    {
-        Value: mediaType,
-        Label: 'Media Type'
-    }
+//     {
+//         Value: mediaType,
+//         Label: 'Media Type'
+//     }
     
-]);
+// ]);

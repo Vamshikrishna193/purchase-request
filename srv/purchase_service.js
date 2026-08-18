@@ -103,61 +103,61 @@ module.exports = cds.service.impl(async function () {
             );
         }
 
-        // Rule 29 - Attachment Requirement
-        if (Number(purchaseRequest.totalAmount) > 100000) {
+        // // Rule 29 - Attachment Requirement
+        // if (Number(purchaseRequest.totalAmount) > 100000) {
  
-            if (
-                !purchaseRequest.attachments ||
-                purchaseRequest.attachments.length === 0
-            ) {
-                return req.error(
-                    400,
-                    'Supporting document attachment is mandatory when Total Amount exceeds ₹1,00,000.'
-                );
-            }
+        //     if (
+        //         !purchaseRequest.attachments ||
+        //         purchaseRequest.attachments.length === 0
+        //     ) {
+        //         return req.error(
+        //             400,
+        //             'Supporting document attachment is mandatory when Total Amount exceeds ₹1,00,000.'
+        //         );
+        //     }
  
-            const allowedExtensions = [
-                'pdf',
-                'jpg',
-                'jpeg',
-                'png'
-            ];
+        //     const allowedExtensions = [
+        //         'pdf',
+        //         'jpg',
+        //         'jpeg',
+        //         'png'
+        //     ];
  
-            for (const attachment of purchaseRequest.attachments) {
+        //     for (const attachment of purchaseRequest.attachments) {
  
-                const fileName =
-                    attachment.fileName ||
-                    attachment.filename ||
-                    '';
+        //         const fileName =
+        //             attachment.fileName ||
+        //             attachment.filename ||
+        //             '';
  
-                const extension = fileName.includes('.')
-                    ? fileName.split('.').pop().toLowerCase()
-                    : '';
+        //         const extension = fileName.includes('.')
+        //             ? fileName.split('.').pop().toLowerCase()
+        //             : '';
  
-                if (
-                    !extension ||
-                    !allowedExtensions.includes(extension)
-                ) {
-                    return req.error(
-                        400,
-                        `Invalid attachment type '${fileName || 'Unknown'}'. Only PDF, JPG, JPEG and PNG files are allowed.`
-                    );
-                }
+        //         if (
+        //             !extension ||
+        //             !allowedExtensions.includes(extension)
+        //         ) {
+        //             return req.error(
+        //                 400,
+        //                 `Invalid attachment type '${fileName || 'Unknown'}'. Only PDF, JPG, JPEG and PNG files are allowed.`
+        //             );
+        //         }
  
-                const fileSize = Number(
-                    attachment.fileSize ||
-                    attachment.size ||
-                    0
-                );
+        //         const fileSize = Number(
+        //             attachment.fileSize ||
+        //             attachment.size ||
+        //             0
+        //         );
  
-                if (fileSize > 10 * 1024 * 1024) {
-                    return req.error(
-                        400,
-                        `Attachment '${fileName}' exceeds the maximum allowed size of 10 MB.`
-                    );
-                }
-            }
-        }
+        //         if (fileSize > 10 * 1024 * 1024) {
+        //             return req.error(
+        //                 400,
+        //                 `Attachment '${fileName}' exceeds the maximum allowed size of 10 MB.`
+        //             );
+        //         }
+        //     }
+        // }
 
         // // Only after all validations pass
         // await UPDATE(PurchaseRequests)

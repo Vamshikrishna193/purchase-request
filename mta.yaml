@@ -1,80 +1,133 @@
 _schema-version: 3.3.0
 ID: purchase-request-system
+description: A simple CAP project.
 version: 1.0.0
-description: "A simple CAP project."
+modules:
+- name: purchase-request-system-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: purchase-request-system-auth
+  - name: purchase-request-system-db
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    buildpack: nodejs_buildpack
+    instances: 1
+  build-parameters:
+    builder: npm-ci
+- name: purchase-request-system-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: purchase-request-system-db
+  parameters:
+    buildpack: nodejs_buildpack
+- name: purchase-request-system
+  type: approuter.nodejs
+  path: app/router
+  requires:
+  - name: srv-api
+    group: destinations
+    properties:
+      forwardAuthToken: true
+      name: srv-api
+      url: ~{srv-url}
+  - name: purchase-request-system-auth
+  - name: purchase-request-system-destination-service
+    group: destinations
+    properties:
+      forwardAuthToken: false
+      name: ui5
+      url: https://ui5.sap.com
+  provides:
+  - name: app-api
+    properties:
+      app-protocol: ${protocol}
+      app-uri: ${default-uri}
+  parameters:
+    disk-quota: 256M
+    keep-existing-routes: true
+    memory: 256M
+- name: purchase-request-system-app-content
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: purchase-request-system-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - project1.zip
+      name: project1
+      target-path: resources/
+- name: project1
+  type: html5
+  path: app/project1
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: purchase-request-system-auth
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      oauth2-configuration:
+        credential-types:
+        - binding-secret
+        - x509
+        redirect-uris:
+        - https://*~{app-api/app-uri}/**
+      tenant-mode: dedicated
+      xsappname: purchase-request-system-${org}-${space}
+    path: ./xs-security.json
+    service: xsuaa
+    service-plan: application
+  requires:
+  - name: app-api
+- name: purchase-request-system-db
+  type: com.sap.xs.hdi-container
+  parameters:
+    service: hana
+    service-plan: hdi-shared
+- name: purchase-request-system-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: purchase-request-system-html5-service
+    service-plan: app-host
+- name: purchase-request-system-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: false
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: purchase-request-system-destination-service
+    service-plan: lite
 parameters:
+  deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - npm ci
-        - npx cds build --production
-modules:
-  - name: purchase-request-system-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      instances: 1
-      buildpack: nodejs_buildpack
-    build-parameters:
-      builder: npm-ci
-    provides:
-      - name: srv-api # required by consumers of CAP services (e.g. approuter)
-        properties:
-          srv-url: ${default-url}
-    requires:
-      - name: purchase-request-system-auth
-      - name: purchase-request-system-db
-
-  - name: purchase-request-system-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    requires:
-      - name: purchase-request-system-db
-  - name: purchase-request-system
-    type: approuter.nodejs
-    path: app/router
-    parameters:
-      keep-existing-routes: true
-      disk-quota: 256M
-      memory: 256M
-    requires:
-      - name: srv-api
-        group: destinations
-        properties:
-          name: srv-api # must be used in xs-app.json as well
-          url: ~{srv-url}
-          forwardAuthToken: true
-      - name: purchase-request-system-auth
-    provides:
-      - name: app-api
-        properties:
-          app-protocol: ${protocol}
-          app-uri: ${default-uri}
-
-resources:
-  - name: purchase-request-system-auth
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: xsuaa
-      service-plan: application
-      path: ./xs-security.json
-      config:
-        xsappname: purchase-request-system-${org}-${space}
-        tenant-mode: dedicated
-        oauth2-configuration:
-          credential-types:
-            - "binding-secret"
-            - "x509"
-          redirect-uris:
-            - https://*~{app-api/app-uri}/**
-    requires:
-      - name: app-api
-  - name: purchase-request-system-db
-    type: com.sap.xs.hdi-container
-    parameters:
-      service: hana
-      service-plan: hdi-shared
+  - builder: custom
+    commands:
+    - npm ci
+    - npx cds build --production
